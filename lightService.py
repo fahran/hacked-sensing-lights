@@ -1,7 +1,12 @@
-#import requests
+import requests
+import json
 
-#r = requests.get('https://github.com/timeline.json')
+baseUrl = "http://192.168.2.76/api/fahranHacked/"
 
-#print r.text
+def turnMiddleLightToHue(hue):
+	turnLightToHue(1, hue)
 
-print "hello world!"
+def turnLightToHue(lightId, hue):
+    payload = {'hue': hue}
+	url = baseUrl + "lights/" + lightId + "/state"
+	requests.put(url, data=json.dumps(payload))
