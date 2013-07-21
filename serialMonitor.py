@@ -2,10 +2,13 @@ import serial, copy, time
 from light import light
 from serial.tools import list_ports
 from copy import *
+import musicPlayer
 #python -m serial.tools.list_ports <-will print list of available ports
 #port = serial.Serial(0) #open first port, no time out
 #port = serial.Serial(2, 9600, timeout = 5) #third port (i have three ports on my laptop, this happens to be the one I had that was free, baudrate = 9600, timeout = 5s
 port = None
+
+player = musicPlayer.musicClient()
 
 class tracker():
     def __init__(self, steps=1):
@@ -46,6 +49,12 @@ class valueTracker(tracker):
         result = self.averageUpdate(value)
         return result #returns -1 until given values processed
 
+def updateMusic():
+    if not lamp.state == lamp.lastState:
+        player.stopMusic()
+        player.playRandomMoodSong(state)
+
+
 def init():
     #global port
     portsList = list_ports.comports()
@@ -65,45 +74,45 @@ def init():
         return port
 
 def main():
-        lamp = light(1, pulseFlag = True)
-        print lamp
-        heatChange = changeTracker(50) #averages change over (x) readings
-        heatValue = valueTracker(50)
-        pulseMeter = valueTracker()
+        lamp = light(1, pulseFlag = True, tempFlag = True)
+        tempDifference = valueTracker(30)
+        ambientHeat = valueTracker(50)
+        pulseMeter = valueTracker(30)
         #continuous loop taking value from serial port
         for line in port:
-                #print line
-                values = str.split(line)
-                temp = float(values[0])
-                pulse = int(values[1])
-                print pulse
-                #sensor = values[1]
-                #print temp
-                #print sensor
+            #print "Output:"
+            #print line
+            values = str.split(line)
+            ambientTemp = float(values[0])
+            probeTemp = float(values[1])
+            pulse = int(values[3])
 
-                #tracker updates
-                tempChange = heatChange.update(temp)
-                #periodically returns average value:
-                if not tempChange == -1:
-                    pass
-                    #action on valid response:
-                    #print "Temperature change: " + str(tempChange)
+            #print temp
+            #print sensor
+            #print pulse
 
-                tempValue = heatValue.update(temp)
-                if not tempValue == -1:
-                    pass
-                    #action on valid response:
-                    #print "Current temperature: " + str(tempValue)
+            #tracker updates
+            tempValue = tempDifference.update(probeTemp-ambientTemp)
+            if not tempValue == -1:
+                #action on valid response:
+                print "Current temperature Difference: " + str(tempValue)
+                lamp.tempValue = tempValue
 
-                pulseValue = pulseMeter.update(pulse)
-                if pulseValue == 1023:
-                    #print "pulse False"
-                    lamp.pulse = False
-                else:
-                    #print "pulse True"
-                    lamp.pulse = True
 
-                lamp.update()
+            pulseValue = pulseMeter.update(pulse)
+            if pulseValue <= 0:
+                #print "pulse False"
+                lamp.pulse = False
+                #pass
+
+            else:
+                #print "pulse True"
+                lamp.pulse = True
+                #lamp.pulseOnceFlag = True
+
+            lamp.update()
+            updateMusic()
+
 
 
 
