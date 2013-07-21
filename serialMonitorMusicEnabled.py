@@ -68,7 +68,7 @@ def init():
         return port
 
 def main():
-        lamp = light(1, pulseFlag = True, tempFlag = True)
+        lamp = light(3, pulseFlag = True, tempFlag = True)
         player.playRandomMoodSong(lamp.state)
         tempDifference = valueTracker(30)
         ambientHeat = valueTracker(50)

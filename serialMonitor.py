@@ -68,7 +68,7 @@ def init():
         return port
 
 def main():
-        lamp = light(1, pulseFlag = True, tempFlag = True)
+        lamp = light(2, pulseFlag = True, tempFlag = True)
         tempDifference = valueTracker(30)
         ambientHeat = valueTracker(50)
         pulseMeter = valueTracker(30)
