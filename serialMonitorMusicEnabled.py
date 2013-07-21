@@ -2,13 +2,13 @@ import serial, copy, time
 from light import light
 from serial.tools import list_ports
 from copy import *
-#import musicPlayer
+import musicPlayer
 #python -m serial.tools.list_ports <-will print list of available ports
 #port = serial.Serial(0) #open first port, no time out
 #port = serial.Serial(2, 9600, timeout = 5) #third port (i have three ports on my laptop, this happens to be the one I had that was free, baudrate = 9600, timeout = 5s
 port = None
 
-#player = musicPlayer.musicClient()
+player = musicPlayer.musicClient()
 
 class tracker():
     def __init__(self, steps=1):
@@ -69,6 +69,7 @@ def init():
 
 def main():
         lamp = light(1, pulseFlag = True, tempFlag = True)
+        player.playRandomMoodSong(lamp.state)
         tempDifference = valueTracker(30)
         ambientHeat = valueTracker(50)
         pulseMeter = valueTracker(30)
@@ -105,19 +106,22 @@ def main():
                 #lamp.pulseOnceFlag = True
 
             lamp.update()
-            #updateMusic(lamp)
+            updateMusic(lamp)
 
-'''
+
 def updateMusic(lamp):
     if not lamp.state == lamp.lastState:
+        print "updateMusic"
         player.stopMusic()
-        player.playRandomMoodSong(state)
-'''
+        player.playRandomMoodSong(lamp.state)
+
 if __name__ == '__main__':
     try:
         port = init()
         main()
     except SystemExit:
+        player.stopMusic()
         quit
     except KeyboardInterrupt:
+        player.stopMusic()
         quit

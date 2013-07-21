@@ -9,7 +9,7 @@ class light():
     red = 65535
 
     def __init__(self, id, cycleFlag = False, pulseFlag = False, pulseOnceFlag = False, tempFlag = False):
-        self.getUrl = "http://192.168.2.76/api/fahranHacked/lights/" + str(id)
+        self.getUrl = "http://192.168.2.203/api/newdeveloper/lights/" + str(id)
         self.updateUrl = self.getUrl + "/state"
 
         self.id = id
@@ -60,7 +60,7 @@ class light():
             self.shiftColour(1000)
 
     def setColour(self, value):
-        print value
+        #print value
         requests.put(self.updateUrl, data=json.dumps({"hue":value}))
 
     def updateBrightness(self):
@@ -89,7 +89,7 @@ class light():
     def tempToColour(self):
         if self.tempFlag:
             value = self.tempValue
-            lastState = state
+            self.lastState = self.state
             if value <= 5:
                 #chilled
                 self.setColour(self.blue)
@@ -106,7 +106,7 @@ class light():
                     if value > 10:
                         value = 10
                     colour = self.blue + ((self.purple-self.blue) * (value/10))
-                    print colour
+                    #print colour
                     self.setColour(colour)
                     self.state = "active"
 
