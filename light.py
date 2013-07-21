@@ -5,7 +5,7 @@ import time
 class light():
     hueCap = 65280
 
-    def __init__(self, id, cycleFlag, pulseFlag):
+    def __init__(self, id, cycleFlag = False, pulseFlag = False):
         self.getUrl = "http://192.168.2.76/api/fahranHacked/lights/" + str(id)
         self.updateUrl = self.getUrl + "/state"
 
