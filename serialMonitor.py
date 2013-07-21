@@ -1,4 +1,5 @@
 import serial, copy
+import light
 from serial.tools import list_ports
 from copy import *
 #python -m serial.tools.list_ports <-will print list of available ports
@@ -7,7 +8,7 @@ from copy import *
 port = None
 
 class tracker():
-    def __init__(self, steps):
+    def __init__(self, steps=1):
         self.firstUpdate = True
         self.lastVal = 0.0
         self.difference = 0.0
@@ -45,7 +46,6 @@ class valueTracker(tracker):
         result = self.averageUpdate(value)
         return result #returns -1 until given values processed
 
-
 def init():
     #global port
     portsList = list_ports.comports()
@@ -60,19 +60,23 @@ def init():
             port = serial.Serial(portNumber, 9600, timeout = 5)
             print "Using serial connection on " + str(port.portstr) #print what port was selected... hopefully should work fine if there's only 1!
         except:
-            print "No port active!"
+            raise Exception ("No port active!")
+
         return port
 
 def main():
+        lamp = light.light(1, pulseFlag = True)
         heatChange = changeTracker(5) #averages change over (x) readings
         heatValue = valueTracker(5)
+        pulseMeter = valueTracker()
         #continuous loop taking value from serial port
         for line in port:
-                #print line
+                print line
                 values = str.split(line)
                 temp = float(values[0])
+                pulse = int(values[2])
                 #sensor = values[1]
-                print temp
+                #print temp
                 #print sensor
 
                 #tracker updates
@@ -86,6 +90,14 @@ def main():
                 if not tempValue == -1:
                     #action on valid response:
                     print "Current temperature: " + str(tempValue)
+
+                pulseValue = pulseMeter.update(pulse)
+                if pulseValue == 0:
+                    lamp.pulse = False
+                else:
+                    lamp.pulse = True
+
+
 
 if __name__ == '__main__':
     try:
