@@ -6,9 +6,6 @@ from copy import *
 #port = serial.Serial(2, 9600, timeout = 5) #third port (i have three ports on my laptop, this happens to be the one I had that was free, baudrate = 9600, timeout = 5s
 port = None
 
-
-
-
 class tracker():
     def __init__(self, steps):
         self.firstUpdate = True

@@ -35,5 +35,5 @@ if __name__ == '__main__':
         main()
     except SystemExit:
         quit
-    except KeyboardInterrupt:
+    except KeyboardInterrup t:
         quit
