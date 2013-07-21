@@ -10,8 +10,8 @@ class light():
         self.updateUrl = self.getUrl + "/state"
 
         self.id = id
-        self.cycleFlag = False
-        self.pulseFlag = False
+        self.cycleFlag = cycleFlag
+        self.pulseFlag = pulseFlag
         self.pulse = False
         self.maxBri= 255
         self.minBri = 10
