@@ -1,4 +1,5 @@
-import serial, copy
+import serial, copy, time
+from light import light
 from serial.tools import list_ports
 from copy import *
 #python -m serial.tools.list_ports <-will print list of available ports
@@ -7,7 +8,7 @@ from copy import *
 port = None
 
 class tracker():
-    def __init__(self, steps):
+    def __init__(self, steps=1):
         self.firstUpdate = True
         self.lastVal = 0.0
         self.difference = 0.0
@@ -45,7 +46,6 @@ class valueTracker(tracker):
         result = self.averageUpdate(value)
         return result #returns -1 until given values processed
 
-
 def init():
     #global port
     portsList = list_ports.comports()
@@ -57,35 +57,55 @@ def init():
         portNumber = int(portName[3]) - 1
         #print portNumber
         try:
-            port = serial.Serial(portNumber, 9600, timeout = 5)
+            port = serial.Serial(portNumber, 57600, timeout = 5)
             print "Using serial connection on " + str(port.portstr) #print what port was selected... hopefully should work fine if there's only 1!
         except:
-            print "No port active!"
+            raise Exception ("No port active!")
+
         return port
 
 def main():
-        heatChange = changeTracker(5) #averages change over (x) readings
-        heatValue = valueTracker(5)
+        lamp = light(1, pulseFlag = True)
+        print lamp
+        heatChange = changeTracker(50) #averages change over (x) readings
+        heatValue = valueTracker(50)
+        pulseMeter = valueTracker()
         #continuous loop taking value from serial port
         for line in port:
                 #print line
                 values = str.split(line)
                 temp = float(values[0])
+                pulse = int(values[1])
+                print pulse
                 #sensor = values[1]
-                print temp
+                #print temp
                 #print sensor
 
                 #tracker updates
                 tempChange = heatChange.update(temp)
                 #periodically returns average value:
                 if not tempChange == -1:
+                    pass
                     #action on valid response:
-                    print "Temperature change: " + str(tempChange)
+                    #print "Temperature change: " + str(tempChange)
 
                 tempValue = heatValue.update(temp)
                 if not tempValue == -1:
+                    pass
                     #action on valid response:
-                    print "Current temperature: " + str(tempValue)
+                    #print "Current temperature: " + str(tempValue)
+
+                pulseValue = pulseMeter.update(pulse)
+                if pulseValue == 1023:
+                    #print "pulse False"
+                    lamp.pulse = False
+                else:
+                    #print "pulse True"
+                    lamp.pulse = True
+
+                lamp.update()
+
+
 
 if __name__ == '__main__':
     try:
