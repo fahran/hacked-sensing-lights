@@ -13,14 +13,14 @@ class light():
         self.cycleFlag = cycleFlag
         self.pulseFlag = pulseFlag
         self.pulse = False
-        self.maxBri= 255
+        self.maxBri= 150
         self.minBri = 10
-        self.briShift = 2.0
+        self.briShift = 245
         self.bri = json.loads(requests.get(self.getUrl).text)["state"]["bri"]
         self.colour = json.loads(requests.get(self.getUrl).text)["state"]["hue"]
         self.lastUpdateTime = time.time()
 
-        self.setTransitionTime(2)
+        self.setTransitionTime(0)
 
     def setHue(self, hue):
         payload = {'hue': hue}
@@ -37,7 +37,7 @@ class light():
         requests.put(self.updateUrl, data=json.dumps({"transitiontime":val}))
 
     def shiftBrightness(self, val):
-        self.bri = (self.bri * val)
+        self.bri = (self.bri + val)
         self.bri = max(self.minBri, self.bri)
         self.bri = min(self.maxBri, self.bri)
 
@@ -55,7 +55,7 @@ class light():
 
             else:
                 if self.bri > self.minBri:
-                    self.shiftBrightness(1/self.briShift)
+                    self.shiftBrightness(-self.briShift)
 
     def update(self):
         if time.time() - self.lastUpdateTime > 0.2:
